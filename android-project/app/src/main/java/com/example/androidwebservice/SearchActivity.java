@@ -17,34 +17,29 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-public class PostActivity extends AppCompatActivity implements View.OnClickListener {
-    private EditText editTextKeyword;
-    private EditText editTextValue;
-    private ListView listViewKeywords;
+public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
+    private EditText editTextSearch;
+    private ListView listViewSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post);
+        setContentView(R.layout.activity_search);
 
-        Button buttonPost = findViewById(R.id.buttonPost);
-        editTextKeyword = findViewById(R.id.editTextKeyword);
-        editTextValue = findViewById(R.id.editTextValue);
-        listViewKeywords = findViewById(R.id.listViewKeywords);
+        Button buttonSearch = findViewById(R.id.buttonSearch);
+        editTextSearch = findViewById(R.id.editTextSearch);
+        listViewSearch = findViewById(R.id.listViewSearch);
 
-        buttonPost.setOnClickListener(this);
+        buttonSearch.setOnClickListener(this);
     }
 
-    private void saveKeywordToServer() {
+    private void searchKeywordOnServer() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Saving keyword...");
+        progressDialog.setMessage("Searching keyword...");
         progressDialog.show();
 
-        final String keyword = editTextKeyword.getText().toString().trim();
-        final String value = editTextValue.getText().toString().trim();
+        final String keyword = editTextSearch.getText().toString().trim();
 
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
@@ -53,6 +48,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
                 try {
                     JSONObject jsonObject = new JSONObject(response);
+                    String value = jsonObject.getString("value");
                     boolean synced = !jsonObject.getBoolean("error");
                     updateKeywordViews(keyword, value, synced);
                 } catch (JSONException e) {
@@ -60,42 +56,30 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 progressDialog.dismiss();
-
-                updateKeywordViews(keyword, value, false);
             }
         };
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, MainActivity.URL_WEB_SERVICE, listener, errorListener) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("keyword", keyword);
-                params.put("value", value);
-                return params;
-            }
-        };
+        String url = MainActivity.URL_WEB_SERVICE + "?keyword=" + keyword;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, listener, errorListener);
 
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
-    private void updateKeywordViews(String keyword, String value, boolean synced) {
-        editTextKeyword.setText("");
-        editTextValue.setText("");
+    public void updateKeywordViews(String keyword, String value, boolean synced) {
+        editTextSearch.setText("");
 
-        // Update the list view
         Keyword kw = new Keyword(keyword, value, synced);
         KeywordAdapter keywordAdapter = new KeywordAdapter(this, R.layout.keywords, Collections.singletonList(kw));
-        listViewKeywords.setAdapter(keywordAdapter);
+        listViewSearch.setAdapter(keywordAdapter);
         keywordAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClick(View v) {
-        saveKeywordToServer();
+        searchKeywordOnServer();
     }
 }
