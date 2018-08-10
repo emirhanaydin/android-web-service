@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String URL_WEB_SERVICE = "http://192.168.1.100/android-web-service/keywords.php";
+    public static final String URL_WEB_SERVICE = "http://51.68.212.93:8080/android-web-service/keywords.php";
 
     Button buttonSave;
     Button buttonSearch;
