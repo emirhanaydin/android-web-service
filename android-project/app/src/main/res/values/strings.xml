@@ -2,6 +2,7 @@
     <string name="app_name">Android Web Service</string>
     <string name="post">Post</string>
     <string name="search">Search</string>
+    <string name="refresh">Refresh</string>
     <string name="enter_keyword_hint">Enter a keyword</string>
     <string name="enter_value_hint">Enter a value</string>
     <string name="keyword_placeholder">Keyword</string>

@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         buttonSave = findViewById(R.id.buttonSave);
         buttonSearch = findViewById(R.id.buttonSearch);
-        buttonList = findViewById(R.id.buttonList);
+        buttonList = findViewById(R.id.buttonRefresh);
 
         buttonSave.setOnClickListener(this);
         buttonSearch.setOnClickListener(this);
@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         } else if (v == buttonSearch) {
             Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+        } else if (v == buttonList) {
+            Intent intent = new Intent(this, ListActivity.class);
             startActivity(intent);
         }
     }
