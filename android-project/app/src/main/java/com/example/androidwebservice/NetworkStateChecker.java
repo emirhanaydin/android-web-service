@@ -62,7 +62,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
                     databaseHelper.updateKeywordSynced(id, true);
 
                     // Send broadcast to refresh the list
-                    context.sendBroadcast(new Intent(MainActivity.DATA_SAVED_BROADCAST));
+                    context.sendBroadcast(new Intent(PostActivity.DATA_SAVED_BROADCAST));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -74,7 +74,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
             }
         };
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, MainActivity.URL_WEB_SERVICE, listener, errorListener) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PostActivity.URL_WEB_SERVICE, listener, errorListener) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();

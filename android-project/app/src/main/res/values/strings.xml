@@ -5,4 +5,7 @@
     <string name="enter_value_hint">Enter a value</string>
     <string name="keyword_placeholder">Keyword</string>
     <string name="value_placeholder">Value</string>
+    <string name="save_to_server">Save to the server</string>
+    <string name="search_on_server">Search on the server</string>
+    <string name="list_server_records">List records on the server</string>
 </resources>

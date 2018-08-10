@@ -1,52 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.androidwebservice.MainActivity">
+    tools:context=".MainActivity">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/buttonSave"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="100dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="50dp"
+        android:text="@string/save_to_server"
+        android:textSize="20sp" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/editTextKeyword"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:ems="10"
-                android:hint="@string/enter_keyword_hint"
-                android:inputType="textPersonName" />
-
-            <EditText
-                android:id="@+id/editTextValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/enter_value_hint"
-                android:inputType="textPersonName" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/buttonPost"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/post" />
-
-    </LinearLayout>
-
-    <ListView
-        android:id="@+id/listViewKeywords"
+    <Button
+        android:id="@+id/buttonSearch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="100dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/search_on_server"
+        android:textSize="20sp" />
 
+    <Button
+        android:id="@+id/buttonList"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/list_server_records"
+        android:textSize="20sp" />
 </LinearLayout>
