@@ -36,8 +36,8 @@ public class KeywordAdapter extends ArrayAdapter<Keyword> {
         textViewValue.setText(keyword.getValue());
 
         final int iconId = keyword.getSynced()
-                ? R.drawable.success
-                : R.drawable.stopwatch;
+                ? R.drawable.successful
+                : R.drawable.failure;
         textViewValue.setCompoundDrawablesWithIntrinsicBounds(0, 0, iconId, 0);
 
         return listView;

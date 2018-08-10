@@ -30,8 +30,8 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:drawableEnd="@drawable/success"
-            android:drawableRight="@drawable/success"
+            android:drawableEnd="@drawable/successful"
+            android:drawableRight="@drawable/successful"
             android:gravity="center"
             android:text="@string/value_placeholder" />
 
