@@ -29,18 +29,15 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String URL_WEB_SERVICE = "http://192.168.1.100/android-web-service/save-name.php";
-    public static final int NAME_SYNCED_WITH_SERVER = 1;
-    public static final int NAME_NOT_SYNCED_WITH_SERVER = 0;
+    public static final String URL_WEB_SERVICE = "http://192.168.1.100/android-web-service/keywords.php";
     public static final String DATA_SAVED_BROADCAST = "com.example.datasaved";
     private DatabaseHelper databaseHelper;
-    private Button buttonSave;
-    private EditText editTextName;
-    private ListView listViewNames;
-    private List<Name> names;
-    private BroadcastReceiver broadcastReceiver;
+    private EditText editTextKeyword;
+    private EditText editTextValue;
+    private ListView listViewKeywords;
+    private List<Keyword> keywords;
 
-    private NameAdapter nameAdapter;
+    private KeywordAdapter keywordAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +47,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         registerReceiver(new NetworkStateChecker(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         databaseHelper = new DatabaseHelper(this);
-        names = new ArrayList<>();
+        keywords = new ArrayList<>();
 
-        buttonSave = findViewById(R.id.buttonSave);
-        editTextName = findViewById(R.id.editTextName);
-        listViewNames = findViewById(R.id.listViewNames);
+        Button buttonPost = findViewById(R.id.buttonPost);
+        editTextKeyword = findViewById(R.id.editTextKeyword);
+        editTextValue = findViewById(R.id.editTextValue);
+        listViewKeywords = findViewById(R.id.listViewKeywords);
 
-        buttonSave.setOnClickListener(this);
+        buttonPost.setOnClickListener(this);
 
-        loadNamesFromDatabase();
+        loadKeywordsFromLocal();
 
         // To update sync status
-        broadcastReceiver = new BroadcastReceiver() {
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                loadNamesFromDatabase();
+                loadKeywordsFromLocal();
             }
         };
 
@@ -72,35 +70,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * Load the names from the database with updated sync status.
+     * Load the keywords from the database with updated sync status.
      */
-    private void loadNamesFromDatabase() {
-        names.clear();
+    private void loadKeywordsFromLocal() {
+        keywords.clear();
 
-        Cursor cursor = databaseHelper.getNames();
+        Cursor cursor = databaseHelper.getKeywords();
 
         if (cursor.moveToFirst()) {
             do {
-                String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME));
-                int status = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_STATUS));
-                names.add(new Name(name, status));
+                String keyword = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_KEYWORD));
+                String value = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_VALUE));
+                boolean synced = 0 != cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_SYNCED));
+                keywords.add(new Keyword(keyword, value, synced));
             } while (cursor.moveToNext());
         }
 
-        nameAdapter = new NameAdapter(this, R.layout.names, names);
-        listViewNames.setAdapter(nameAdapter);
+        keywordAdapter = new KeywordAdapter(this, R.layout.keywords, keywords);
+        listViewKeywords.setAdapter(keywordAdapter);
     }
 
     private void refreshList() {
-        nameAdapter.notifyDataSetChanged();
+        keywordAdapter.notifyDataSetChanged();
     }
 
-    private void saveNameToServer() {
+    private void saveKeywordToServer() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Saving name...");
         progressDialog.show();
 
-        final String name = editTextName.getText().toString().trim();
+        final String keyword = editTextKeyword.getText().toString().trim();
+        final String value = editTextValue.getText().toString().trim();
 
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
@@ -109,10 +109,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 try {
                     JSONObject jsonObject = new JSONObject(response);
-                    int status = jsonObject.getBoolean("error")
-                            ? NAME_NOT_SYNCED_WITH_SERVER
-                            : NAME_SYNCED_WITH_SERVER;
-                    saveNameToLocalStorage(name, status);
+                    boolean synced = !jsonObject.getBoolean("error");
+                    saveKeywordsToLocal(keyword, value, synced);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -124,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onErrorResponse(VolleyError error) {
                 progressDialog.dismiss();
 
-                saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
+                saveKeywordsToLocal(keyword, value, false);
             }
         };
 
@@ -132,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", name);
+                params.put("keyword", keyword);
+                params.put("value", value);
                 return params;
             }
         };
@@ -140,15 +139,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
-    private void saveNameToLocalStorage(String name, int status) {
-        editTextName.setText("");
-        databaseHelper.addName(name, status);
-        names.add(new Name(name, status));
+    private void saveKeywordsToLocal(String keyword, String value, boolean synced) {
+        editTextKeyword.setText("");
+        databaseHelper.addKeyword(keyword, value, synced);
+        keywords.add(new Keyword(keyword, value, synced));
         refreshList();
     }
 
     @Override
     public void onClick(View v) {
-        saveNameToServer();
+        saveKeywordToServer();
     }
 }

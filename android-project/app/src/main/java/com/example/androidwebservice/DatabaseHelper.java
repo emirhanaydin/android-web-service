@@ -7,12 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    //Constants for Database name, table name, and column names
+    //Constants for Database name, table name, and column keywords
     public static final String DB_NAME = "android";
-    public static final String TABLE_NAME = "names";
+    public static final String TABLE_NAME = "keywords";
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_KEYWORD = "keyword";
+    public static final String COLUMN_VALUE = "value";
+    public static final String COLUMN_SYNCED = "synced";
 
     //database version
     private static final int DB_VERSION = 1;
@@ -26,8 +27,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String sql = "CREATE TABLE " + TABLE_NAME
                 + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COLUMN_NAME + " VARCHAR NOT NULL, "
-                + COLUMN_STATUS + " TINYINT "
+                + COLUMN_KEYWORD + " VARCHAR NOT NULL UNIQUE, "
+                + COLUMN_VALUE + " VARCHAR NOT NULL, "
+                + COLUMN_SYNCED + " TINYINT "
                 + ");";
         sqLiteDatabase.execSQL(sql);
     }
@@ -39,39 +41,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public boolean addName(String name, int status) {
+    public boolean addKeyword(String keyword, String value, boolean synced) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(COLUMN_NAME, name);
-        contentValues.put(COLUMN_STATUS, status);
+        contentValues.put(COLUMN_KEYWORD, keyword);
+        contentValues.put(COLUMN_VALUE, value);
+        contentValues.put(COLUMN_SYNCED, synced);
 
         sqLiteDatabase.insert(TABLE_NAME, null, contentValues);
         sqLiteDatabase.close();
         return true;
     }
 
-    public boolean updateNameStatus(int id, int status) {
+    public void updateKeywordSynced(int id, boolean synced) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_STATUS, status);
+        contentValues.put(COLUMN_SYNCED, synced);
         sqLiteDatabase.update(TABLE_NAME, contentValues, COLUMN_ID + "=" + id, null);
         sqLiteDatabase.close();
-        return true;
     }
 
-    public Cursor getNames() {
+    public Cursor getKeywords() {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_ID + " ASC;";
         return sqLiteDatabase.rawQuery(sql, null);
     }
 
     /**
-     * @return All names that are not synchronized with the database.
+     * @return All keywords that are not synchronized with the database.
      */
-    public Cursor getUnsyncedNames() {
+    public Cursor getUnsyncedKeywords() {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + "=0;";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_SYNCED + "=0;";
         return sqLiteDatabase.rawQuery(sql, null);
     }
 }

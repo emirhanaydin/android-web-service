@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -40,18 +39,18 @@ public class NetworkStateChecker extends BroadcastReceiver {
                 return;
         }
 
-        Cursor cursor = databaseHelper.getUnsyncedNames();
+        Cursor cursor = databaseHelper.getUnsyncedKeywords();
         if (!cursor.moveToFirst()) return;
 
         do {
             int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
-            String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME));
+            String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_KEYWORD));
 
-            saveNameToDatabase(id, name);
+            saveKeywordToLocal(id, name);
         } while (cursor.moveToNext());
     }
 
-    private void saveNameToDatabase(final int id, final String name) {
+    private void saveKeywordToLocal(final int id, final String keyword) {
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -60,7 +59,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
                     if (jsonObject.getBoolean("error")) return;
 
                     // Update the status in SQLite
-                    databaseHelper.updateNameStatus(id, MainActivity.NAME_SYNCED_WITH_SERVER);
+                    databaseHelper.updateKeywordSynced(id, true);
 
                     // Send broadcast to refresh the list
                     context.sendBroadcast(new Intent(MainActivity.DATA_SAVED_BROADCAST));
@@ -79,7 +78,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", name);
+                params.put("keyword", keyword);
                 return params;
             }
         };
