@@ -1,0 +1,46 @@
+language: android
+sudo: required
+jdk: oraclejdk8
+env:
+  global:
+  - ANDROID_API=27
+  - ANDROID_BUILD_TOOLS=27.0.3
+android:
+  components:
+  - tools
+  - platform-tools
+  - tools
+  - build-tools-$ANDROID_BUILD_TOOLS
+  - android-$ANDROID_API
+  licenses:
+  - android-sdk-preview-license-.+
+  - android-sdk-license-.+
+  - google-gdk-license-.+
+before_install:
+- openssl aes-256-cbc -K $encrypted_0ab8985a1a30_key -iv $encrypted_0ab8985a1a30_iv
+  -in android-web-service.keystore.enc -out android-web-service.keystore -d
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
+  - $HOME/.android/build-cache
+before_script:
+- chmod +x gradlew
+script:
+- ./gradlew clean signingReport assembleRelease
+before_deploy:
+- cd app/build/outputs/apk/
+deploy:
+  provider: releases
+  skip_cleanup: true
+  overwrite: true
+  file: android-web-service.apk
+  on:
+    repo: emirhanaydin/android-web-service
+    tags: true
+    jdk: oraclejdk8
+  api_key:
+    secure: Sz3TcOmax0mty7okcHT1nXEd7Tw9LRsvKk20IEl7E0WWgk6TZJrO4hWAuo82e8I+dk0ESh8czGxQZIdfpAT+Lu2tLSL6cTDdeBqYaNcSJnWKHuW9+gvP7vfLB2Vk/7uwJkYRJy4h96np9bX0JcQdNIde8ndABH4JAAcZHBxezAUmijWku/1qCdMxIJNBmphw2fKeotTdAciHsgxH5dTiNBCY+9oqVvdtieuoeEE0RzXtXFlm1PXi+F1XX0tG0oXhk87fumGkweQmfiENOlMVuzo8KokTJBMet5tJP34EW9rzd2gzWgt7Hgti+H2E1cKR5wAOi7ZmeL5OEvY3eH0axpkearwsOFPYmJlz9+bKwsObdjYEUJ36AmTCCBzANwdSh4YjSw7nSYv1kA4ptZ+T9C1/X5FrdZwuJSHeRWNlGbM7duGqfhv1PjhkZcaiY8lDOCMFLHsETkMTl900eEes9sWw6RoU1ML9jXPZ85oDYVL9nyiiovOjwQN1XSUOmxkxog8XozgRDPYp2G5ZZncXEl4wA3+3xwomscFbyRdjrmuXuIvwDvjrBMoij8Tf4rfiAT63vKnHjLDUgaMVobE7YWoc5G24DPY5M7IH6wxcLxxgZoN7NPOBbouKgkuyFIKWhmV7ko/IbViYfivOP1mHl9rXmYmkiue41hielHByyYQ=
