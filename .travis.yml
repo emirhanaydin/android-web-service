@@ -31,13 +31,12 @@ before_script:
 - chmod +x gradlew
 script:
 - ./gradlew clean signingReport assembleRelease
-before_deploy:
-- cd app/build/outputs/apk/
 deploy:
   provider: releases
   skip_cleanup: true
   overwrite: true
-  file: android-web-service.apk
+  file_glob: true
+  file: $TRAVIS_BUILD_DIR/app/build/outputs/apk/release/*
   on:
     repo: emirhanaydin/android-web-service
     tags: true
